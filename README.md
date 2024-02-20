@@ -1,65 +1,42 @@
-![alt text](https://rightshero.com/public/assets/pp-assets/images/rh-logo.png)
+# Rightshero-Category Project Installation Guide
 
+Welcome to the Rightshero-Category project! This README provides step-by-step instructions on how to set up and run the project on your local machine.
 
-# Software Engineer Task Assessment
+## Prerequisites
 
-This role will be part of the Rightshero software development team.
+Before you begin, ensure you have the following installed:
 
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
+1. Docker https://www.docker.com/products/docker-desktop/
+2. Windows Subsystem for Linux (WSL) (only if your operating system is Windows) https://learn.microsoft.com/en-us/windows/wsl/install
 
-The team is tasked with handling all the software aspects of our service.
+## Installation
 
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
+Follow these steps to get the project up and running:
 
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
+1. Clone the project to your local machine.
+2. Navigate to the `Rightshero-Category` folder.
+3. Open the terminal and run the following command:
 
-- [ ] Category A
-- [ ] Category B
+   - docker-compose up --build
 
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
+## Running the Application
 
-### Example
-- [ ] Category A
-- [ ] Category B
+Once the build is complete, you can access the application at: http://localhost:8000/category
 
-If user select “Category B”
-The system will create another 2 checkboxes with
+## Using the BFS Algorithm
 
-- [ ] SUB Category B1
-- [ ] SUB Category B2
+Purpose:
 
-Selecting Sub Category B2 will create another 2 checkboxes
+1. The Breadth-First Search (BFS) algorithm efficiently explores graph structures, traversing nodes layer by layer, ensuring nodes closer to the starting point are processed first.
+2. In this project, BFS can be used to:
 
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+- Retrieve all child categories under a given parent category.
+- Perform other graph-related tasks that require visiting nodes systematically.
 
+## Support
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
+If you encounter any issues during the installation process, please don’t hesitate to reach out. You can contact me at any time via email at ahmedgamal1452@gmail.com.
 
+Happy coding!
 
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Laravel or Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
-
-
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+# Rightshero-Category
