@@ -31,7 +31,6 @@ Purpose:
 2. In this project, BFS can be used to:
 
 - Retrieve all child categories under a given parent category.
-- Perform other graph-related tasks that require visiting nodes systematically.
 
 ## Support
 
