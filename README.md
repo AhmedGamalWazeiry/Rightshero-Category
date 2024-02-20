@@ -23,6 +23,10 @@ Follow these steps to get the project up and running:
 
 Once the build is complete, you can access the application at: http://localhost:8000/category
 
+- admin-dashboard at : http://localhost:8000/admin/
+  USERNAME=admin
+  PASSWORD=adminadmin
+
 ## Using the BFS Algorithm
 
 Purpose:
