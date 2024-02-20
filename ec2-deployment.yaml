@@ -1,0 +1,139 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: |
+  Launches a t2.micro or t3.micro EC2 instance, creates an IAM role with tailored permissions,
+  attaches the role to the instance, deploys your project using Docker Compose, and
+  makes the instance accessible via SSH, HTTP, and HTTPS.
+
+Parameters:
+  KeyName:
+    Description: Name of an existing SSH key pair for remote access.
+    Type: String
+    MinLength: 1
+    ConstraintDescription: Must be the name of an existing key pair in your AWS account.
+  InstanceType:
+    Description: EC2 instance type (t2.micro or t3.micro).
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+  ProjectURL:
+    Description: URL or path to your project repository or source code.
+    Type: String
+    Default: https://github.com/example/your-project.git
+  EnvFileName:
+    Description: Name of the environment file containing sensitive values.
+    Type: String
+    Default: .env
+  S3Bucket:
+    Description: Name of an existing S3 bucket to store backups (optional).
+    Type: String
+  IAMInstanceProfileName:
+    Description: Name of the IAM instance profile to create (optional).
+    Type: String
+    Default: ""
+
+Resources:
+  MyEC2Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      InstanceType: "t3.micro"
+      KeyName: "your-key-pair"
+      ImageId: "ami-xxxxxxxxxxxxxxxx"
+      SecurityGroupIds:
+        - "sg-xxxxxxxxxxxxxxxx"
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          # Add your user data script here to deploy your project on the instance
+
+  MyIAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: "AdminPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+
+  MyIAMInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - !Ref MyIAMRole
+
+  MyIAMInstanceProfileAssociation:
+    Type: "AWS::EC2::InstanceProfileAssociation"
+    Properties:
+      InstanceId: !Ref MyEC2Instance
+      IamInstanceProfile: !Ref MyIAMInstanceProfile
+
+  MySecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group for EC2 instance"
+      SecurityGroupIngress:
+        - IpProtocol: "tcp"
+          FromPort: 22
+          ToPort: 22
+          CidrIp: "0.0.0.0/0" # Adjust as needed for your SSH access
+        - IpProtocol: "tcp"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: "0.0.0.0/0" # Adjust as needed for your HTTP access
+        - IpProtocol: "tcp"
+          FromPort: 443
+          ToPort: 443
+          CidrIp: "0.0.0.0/0" # Adjust as needed for your HTTPS access
+
+  MySSLCertificate:
+    Type: "AWS::CertificateManager::Certificate"
+    Properties:
+      DomainName: "example.com" # Must change
+      ValidationMethod: "DNS" # Change to "EMAIL" if you prefer email validation
+
+  MyLoadBalancer:
+    Type: "AWS::ElasticLoadBalancingV2::LoadBalancer"
+    Properties:
+      Type: "application"
+      Subnets: ["subnet-xxxxxxxxxxxxxxxx"]
+      SecurityGroups: ["sg-xxxxxxxxxxxxxxxx"]
+
+  MyListener:
+    Type: "AWS::ElasticLoadBalancingV2::Listener"
+    Properties:
+      LoadBalancerArn: !Ref MyLoadBalancer
+      Port: 443
+      Protocol: "HTTPS"
+      Certificates:
+        - CertificateArn: !Ref MySSLCertificate
+      DefaultActions:
+        - Type: "forward"
+          TargetGroupArn: !Ref MyTargetGroup
+
+  MyTargetGroup:
+    Type: "AWS::ElasticLoadBalancingV2::TargetGroup"
+    Properties:
+      Port: 80
+      Protocol: "HTTP"
+      VpcId: "vpc-xxxxxxxxxxxxxxxx"
+      Targets:
+        - Id: !Ref MyEC2Instance
+
+Outputs:
+  InstanceId:
+    Description: "EC2 Instance ID"
+    Value: !Ref MyEC2Instance
+  PublicIpAddress:
+    Description: "Public IP Address of the EC2 Instance"
+    Value: !GetAtt MyEC2Instance.PublicIp

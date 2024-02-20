@@ -1,0 +1,36 @@
+version: "3"
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:14.5
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+    ports:
+      - "5435:5432"
+
+  api:
+    platform: linux/amd64
+    build:
+      context: .
+    env_file:
+      - .env
+    volumes:
+      - .:/home/exampleapp
+      - ./storage:/storage
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - default
+
+volumes:
+  postgres_data: {}
+  postgres_backups: {}
